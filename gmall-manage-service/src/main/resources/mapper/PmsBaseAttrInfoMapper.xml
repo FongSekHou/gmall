@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.gmall.manage.mapper.PmsBaseAttrInfoMapper">
+    <select id="selectAtteInfosByValueSet" resultMap="selectAtteInfosByValueSetMap" parameterType="java.util.Set">
+        SELECT
+        ai.id as ai_id,ai.attr_name,ai.catalog3_id,av.id as av_id,av.attr_id,av.value_name
+        FROM
+        pms_base_attr_info ai,
+        pms_base_attr_value av
+        WHERE
+        ai.id = av.attr_id
+        AND av.id IN
+        <foreach collection="valueSet" open="(" close=")" separator="," item="item">
+            ${item}
+        </foreach>
+    </select>
+    <resultMap id="selectAtteInfosByValueSetMap" type="com.atguigu.gmall.bean.PmsBaseAttrInfo" autoMapping="true">
+        <result column="ai_id" property="id"></result>
+        <collection property="attrValueList" ofType="com.atguigu.gmall.bean.PmsBaseAttrValue" autoMapping="true">
+            <result column="av_id" property="id"></result>
+        </collection>
+    </resultMap>
+    <!--
+        SELECT
+            ai.id as ai_id,ai.attr_name,ai.catalog3_id,av.id as av_id,av.attr_id,av.value_name
+            FROM
+            pms_base_attr_info ai,
+            pms_base_attr_value av
+            WHERE
+            ai.id = av.attr_id
+            AND av.id IN
+
+        IN CONCAT('(',#{valueStr},')') 使用concat拼接set字符串查询失败
+    -->
+    <select id="selectAttrValueListByValueId"  resultMap="selectAttrValueListByValueIdMap">
+        SELECT
+            ba.*,ba.id as ba_id,bv.*,bv.id as bv_id
+        FROM
+            pms_base_attr_info ba,
+            pms_base_attr_value bv
+        WHERE
+            ba.id = bv.attr_id
+          and
+            bv.id in (${valueIdStr})
+    </select>
+
+    <resultMap id="selectAttrValueListByValueIdMap" type="com.atguigu.gmall.bean.PmsBaseAttrInfo" autoMapping="true">
+        <result column="ba_id" property="id"></result>
+        <collection property="attrValueList" ofType="com.atguigu.gmall.bean.PmsBaseAttrValue" autoMapping="true">
+            <result column="bv_id" property="id"></result>
+        </collection>
+    </resultMap>
+</mapper>
