@@ -34,9 +34,9 @@ public class OrderController {
 
     @RequestMapping("/toTrade")
     @LoginRequired
-    public String toTrade(HttpServletRequest request, ModelMap map){
-        String memberId = (String)request.getAttribute("memberId");
-        String nickname = (String)request.getAttribute("nickname");
+    public String toTrade (HttpServletRequest request, ModelMap map) {
+        String memberId = (String) request.getAttribute("memberId");
+        String nickname = (String) request.getAttribute("nickname");
         List<UmsMemberReceiveAddress> umsMemberReceiveAddresses = userService.getReceiveAddressByMemberId(memberId);
         List<OmsCartItem> cartList = cartService.getCartList(memberId);
 
@@ -44,7 +44,7 @@ public class OrderController {
         //将购物车数据项变为订单数据项
         List<OmsOrderItem> omsOrderItems = new ArrayList<>();
         for (OmsCartItem omsCartItem : cartList) {
-            if(omsCartItem.getIsChecked().equals("1")){
+            if (omsCartItem.getIsChecked().equals("1")) {
                 totalAmount = totalAmount.add(omsCartItem.getTotalPrice());//计算价格
 
                 OmsOrderItem omsOrderItem = new OmsOrderItem();
@@ -56,21 +56,22 @@ public class OrderController {
 
         String tradeCode = orderService.generateTradeCode(memberId);//生成交易码并返回给前端
 
-        map.put("nickname",nickname);
-        map.put("userAddressList",umsMemberReceiveAddresses);
-        map.put("omsOrderItems",omsOrderItems);
-        map.put("totalAmount",totalAmount);
-        map.put("tradeCode",tradeCode);
+        map.put("nickname", nickname);
+        map.put("userAddressList", umsMemberReceiveAddresses);
+        map.put("omsOrderItems", omsOrderItems);
+        map.put("totalAmount", totalAmount);
+        map.put("tradeCode", tradeCode);
+
         return "trade";
     }
 
     @RequestMapping("/submitOrder")
     @LoginRequired
-    public ModelAndView submitOrder(String receiveAddressId,String tradeCode,HttpServletRequest request, BigDecimal totalAmount){
-        String memberId = (String)request.getAttribute("memberId");
-        String nickname = (String)request.getAttribute("nickname");
-        boolean success = orderService.checkTradeCode(tradeCode,memberId);
-        if(success){//如果交易码有效
+    public ModelAndView submitOrder (String receiveAddressId, String tradeCode, HttpServletRequest request, BigDecimal totalAmount) {
+        String memberId = (String) request.getAttribute("memberId");
+        String nickname = (String) request.getAttribute("nickname");
+        boolean success = orderService.checkTradeCode(tradeCode, memberId);
+        if (success) {//如果交易码有效
             OmsOrder omsOrder = new OmsOrder();
             List<OmsOrderItem> omsOrderItems = new ArrayList<>();
 
@@ -101,7 +102,7 @@ public class OrderController {
             omsOrder.setReceiverRegion(umsMemberReceiveAddress.getRegion());
             // 封装确认收货时间，当前日期加一天，一天后配送
             Calendar c = Calendar.getInstance();
-            c.add(Calendar.DATE,1);
+            c.add(Calendar.DATE, 1);
             Date time = c.getTime();
             omsOrder.setReceiveTime(time);
 
@@ -119,11 +120,11 @@ public class OrderController {
             List<String> selectedCartItemIds = new ArrayList<>();//被选中的购物车项的id，订单信息生成后购物车项要被删除
             List<OmsCartItem> cartList = cartService.getCartList(memberId);
             for (OmsCartItem omsCartItem : cartList) {
-                if(omsCartItem.getIsChecked().equals("1")){
+                if (omsCartItem.getIsChecked().equals("1")) {
                     selectedCartItemIds.add(omsCartItem.getId());
                     OmsOrderItem omsOrderItem = new OmsOrderItem();
                     // 检价
-                    boolean flag = skuService.checkPrice(omsCartItem.getProductSkuId(),omsCartItem.getPrice());
+                    boolean flag = skuService.checkPrice(omsCartItem.getProductSkuId(), omsCartItem.getPrice());
                     if (!flag) {//验价不通过
                         ModelAndView mv = new ModelAndView("tradeFail");
                         return mv;
@@ -156,7 +157,7 @@ public class OrderController {
             ModelAndView mv = new ModelAndView("redirect:http://127.0.0.1:8087/index");
             //重定向到支付系统
             return mv;
-        }else {//交易码检验失败，提交订单失败
+        } else {//交易码检验失败，提交订单失败
             ModelAndView mv = new ModelAndView("tradeFail");
             return mv;
         }

@@ -122,7 +122,7 @@ public class CartController {
         }
         BigDecimal totalPrice = new BigDecimal("0");
         for (OmsCartItem omsCartItem : omsCartItems) {
-            if (omsCartItem.getIsChecked().equals("1")) {
+            if ("1".equals(omsCartItem.getIsChecked())) {
                 totalPrice = totalPrice.add(omsCartItem.getTotalPrice());
             }
 
@@ -165,7 +165,7 @@ public class CartController {
         // 被勾选商品的总额
         if(omsCartItems!=null){
             for (OmsCartItem omsCartItem1 : omsCartItems) {
-                if (omsCartItem1.getIsChecked().equals("1")){
+                if ("1".equals(omsCartItem1.getIsChecked())){
                     totalAmount = totalAmount.add(omsCartItem1.getTotalPrice());
                 }
             }
